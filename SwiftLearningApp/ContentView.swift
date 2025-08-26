@@ -7,6 +7,7 @@ struct ContentView: View {
     @State private var selectedDay = 1
     @State private var showingLearningDetail = false
     @State private var showingDay2Detail = false
+    @State private var showingDay3Detail = false
     
     var body: some View {
         NavigationView {
@@ -63,6 +64,19 @@ struct ContentView: View {
                     }
                 )
                 
+                // Day 3 学习卡片
+                DayLearningCard(
+                    day: 3,
+                    title: "条件语句与循环",
+                    description: "if语句、switch语句和循环控制",
+                    topics: ["if条件语句", "switch语句", "for循环", "while循环"],
+                    isCompleted: false,
+                    action: {
+                        selectedDay = 3
+                        showingDay3Detail = true
+                    }
+                )
+                
                 // 即将推出的课程
                 ComingSoonCard()
                 
@@ -74,6 +88,8 @@ struct ContentView: View {
                         showingLearningDetail = true
                     } else if selectedDay == 2 {
                         showingDay2Detail = true
+                    } else if selectedDay == 3 {
+                        showingDay3Detail = true
                     }
                 }) {
                     HStack {
@@ -100,6 +116,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showingDay2Detail) {
             Day2LearningView()
+        }
+        .sheet(isPresented: $showingDay3Detail) {
+            Day3LearningView()
         }
     }
 }
@@ -189,7 +208,7 @@ struct ComingSoonCard: View {
                 .font(.headline)
                 .fontWeight(.semibold)
             
-            Text("Day 3-21 正在开发中\n敬请期待！")
+            Text("Day 4-21 正在开发中\n敬请期待！")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
