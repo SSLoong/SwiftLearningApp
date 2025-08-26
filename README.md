@@ -29,6 +29,14 @@
 - **Set集合**：集合运算和唯一性
 - **实践练习**：学生成绩管理器、购物清单等
 
+#### Day 3: 条件语句与循环
+- **if条件语句**：基本条件判断和多重条件
+- **switch多分支语句**：模式匹配和范围判断
+- **for循环遍历**：范围循环和集合遍历
+- **while循环控制**：while和repeat-while循环
+- **控制流语句**：break、continue、guard等
+- **实践练习**：猜数字游戏、成绩统计分析器等
+
 ## 📁 项目结构
 
 ```
@@ -37,6 +45,7 @@ SwiftLearningApp/
 ├── ContentView.swift              # 主界面
 ├── Day1LearningView.swift         # Day 1 学习内容
 ├── Day2LearningView.swift         # Day 2 学习内容
+├── Day3LearningView.swift         # Day 3 学习内容
 ├── InteractiveComponents.swift    # 交互式练习组件
 └── README.md                      # 项目说明
 ```
@@ -158,6 +167,124 @@ let set2: Set = [3, 4, 5, 6]
 print(set1.union(set2))  // 并集
 ```
 
+### Day 3: 条件语句与循环
+
+#### 🤔 if条件语句
+```swift
+let temperature = 25
+
+// 基本if语句
+if temperature > 30 {
+    print("天气很热")
+}
+
+// 多重条件判断
+if temperature > 35 {
+    print("天气非常热")
+} else if temperature > 25 {
+    print("天气温暖")
+} else if temperature > 10 {
+    print("天气凉爽")
+} else {
+    print("天气寒冷")
+}
+```
+
+#### 🎛️ switch语句
+```swift
+let grade = "A"
+
+switch grade {
+case "A":
+    print("优秀！继续保持")
+case "B":
+    print("良好，再接再厉")
+case "C":
+    print("及格，需要努力")
+case "D", "F":
+    print("不及格，加油学习")
+default:
+    print("无效成绩")
+}
+
+// 数值范围匹配
+let score = 85
+switch score {
+case 90...100:
+    print("A等级")
+case 80..<90:
+    print("B等级")
+case 70..<80:
+    print("C等级")
+default:
+    print("其他等级")
+}
+```
+
+#### 🔄 for循环
+```swift
+// 范围循环
+for i in 1...5 {
+    print("第\(i)次循环")
+}
+
+// 遍历数组
+let fruits = ["苹果", "香蕉", "橙子"]
+for fruit in fruits {
+    print("我喜欢\(fruit)")
+}
+
+// 带索引遍历
+for (index, fruit) in fruits.enumerated() {
+    print("\(index + 1). \(fruit)")
+}
+```
+
+#### ⏰ while循环
+```swift
+// 基本while循环
+var count = 1
+while count <= 5 {
+    print("计数: \(count)")
+    count += 1
+}
+
+// repeat-while循环
+var number = 5
+repeat {
+    print("数字: \(number)")
+    number -= 1
+} while number > 0
+```
+
+#### 🎮 控制流语句
+```swift
+// continue跳过当前循环
+for i in 1...10 {
+    if i % 2 == 0 {
+        continue  // 跳过偶数
+    }
+    print("奇数: \(i)")
+}
+
+// break跳出循环
+for i in 1...10 {
+    if i == 5 {
+        break  // 遇到5就停止
+    }
+    print(i)
+}
+
+// guard语句
+func processAge(_ age: Int?) {
+    guard let validAge = age, validAge >= 0 else {
+        print("年龄无效")
+        return
+    }
+    print("有效年龄：\(validAge)")
+}
+```
+
 ## 🎮 交互式组件
 
 ### Day 1 组件
@@ -211,6 +338,48 @@ print(set1.union(set2))  // 并集
 - 理解集合的唯一性特征
 - 交互式学习集合运算
 
+### Day 3 组件
+
+#### 1. 温度判断器
+- 实时调整温度观察条件判断结果
+- 展示对应的if-else逻辑代码
+- 学习多重条件判断的实际应用
+
+#### 2. 成绩评定器
+- 选择科目并调整分数
+- 体验switch语句的范围匹配
+- 可视化等级评定过程
+
+#### 3. for循环数列生成器
+- 设置起始、结束、步长参数
+- 选择不同的序列类型（递增、偶数等）
+- 观察for循环的各种用法
+
+#### 4. while循环倒计时器
+- 可调节的倒计时功能
+- 展示while循环的控制逻辑
+- 学习循环条件的设计
+
+#### 5. 数字猜测游戏
+- 经典的数字猜测游戏
+- 综合应用条件语句和循环
+- 记录猜测历史和尝试次数
+
+#### 6. 成绩统计分析器
+- 班级成绩的统计分析
+- for循环遍历和数据处理
+- 等级分布的可视化展示
+
+#### 7. 密码验证器
+- 多重条件的密码强度验证
+- guard语句的实际应用
+- 条件判断和安全编程
+
+#### 8. FizzBuzz编程游戏
+- 经典编程练习题实现
+- 多重条件判断的综合应用
+- 可视化结果展示
+
 ## 🎨 界面设计
 
 ### 设计理念
@@ -223,7 +392,10 @@ print(set1.union(set2))  // 并集
 - **ConceptCard**：概念介绍卡片（蓝色主题）
 - **CodeExampleCard**：代码示例卡片（绿色主题）
 - **TipCard**：提示信息卡片（橙色主题）
-- **InteractiveCard**：交互式练习卡片（紫色/靛蓝主题）
+- **InteractiveCard**：交互式练习卡片（多彩主题）
+  - Day 1: 紫色/靛蓝主题
+  - Day 2: 绿色/橙色主题  
+  - Day 3: 蓝色/红色/紫色主题
 
 ## 📈 学习路径规划
 
@@ -241,16 +413,22 @@ print(set1.union(set2))  // 并集
   - [x] Dictionary和Set集合
   - [x] 高阶函数应用
   - [x] 5个交互式练习
+- [x] Day 3: 条件语句与循环
+  - [x] if条件语句
+  - [x] switch多分支语句
+  - [x] for循环遍历
+  - [x] while循环控制
+  - [x] 控制流语句
+  - [x] 8个交互式练习
 
 ### 开发中 🚧
-- [ ] Day 3: 条件语句和逻辑运算
-- [ ] Day 4: 循环语句和控制流
-- [ ] Day 5: 可选类型和错误处理
+- [ ] Day 4: 可选类型和错误处理
+- [ ] Day 5: 面向对象编程基础
 
 ### 计划中 📋
-- [ ] Day 6-10: 面向对象编程基础
+- [ ] Day 6-10: 面向对象编程
 - [ ] Day 11-15: 协议和扩展
-- [ ] Day 16-21: 高级特性和实践项目
+- [ ] Day 16-21: 高级特性和项目实战
 
 ## 🔧 开发技术栈
 
@@ -285,6 +463,15 @@ print(set1.union(set2))  // 并集
 - [ ] 掌握Set集合的唯一性和集合运算
 - [ ] 能够使用map、filter、reduce等高阶函数
 
+#### Day 3 检查点
+- [ ] 掌握if条件语句的基本用法和多重条件
+- [ ] 理解switch语句的模式匹配和范围判断
+- [ ] 熟练使用for循环遍历数组和范围
+- [ ] 理解while和repeat-while循环的区别
+- [ ] 掌握break、continue、guard等控制流语句
+- [ ] 能够嵌套使用循环和条件语句
+- [ ] 理解循环中的性能优化原则
+
 ## 🏆 成就系统
 
 ### 学习徽章
@@ -300,9 +487,17 @@ print(set1.union(set2))  // 并集
 - 📚 **集合大师**：精通数组、字典和集合操作
 - 💎 **综合应用者**：完成所有Day 2实践练习
 
+#### Day 3 徽章
+- 🤔 **条件判断专家**：掌握if和switch语句
+- 🔄 **循环控制大师**：熟练使用for和while循环
+- 🎮 **控制流专家**：理解break、continue、guard语句
+- 🎯 **逻辑思维者**：完成所有Day 3综合练习
+- 🧠 **算法初学者**：完成FizzBuzz等经典练习
+
 #### 综合徽章
-- 🌟 **Swift探索者**：完成Day 1-2所有内容
-- 🚀 **创新开发者**：修改组件参数探索更多可能
+- 🌟 **Swift探索者**：完成Day 1-3所有内容
+- 🚀 **逻辑编程者**：掌握Swift的控制结构
+- 🔥 **创新开发者**：修改组件参数探索更多可能
 
 ## 🤝 贡献指南
 
