@@ -3744,6 +3744,624 @@ struct APICallSimulatorCard: View {
     }
 }
 
+// MARK: - Day 5 交互式组件
+
+// MARK: - 人物信息类练习
+struct PersonCard: View {
+    @State private var name = "小明"
+    @State private var age = 25
+    @State private var occupation = "学生"
+    @State private var person: PersonModel?
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("人物信息类")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.purple)
+            
+            Text("创建一个Person类来管理人物信息")
+                .font(.body)
+                .foregroundColor(.secondary)
+            
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("姓名:")
+                        .fontWeight(.medium)
+                    TextField("输入姓名", text: $name)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                }
+                
+                HStack {
+                    Text("年龄:")
+                        .fontWeight(.medium)
+                    TextField("输入年龄", value: $age, format: .number)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .keyboardType(.numberPad)
+                }
+                
+                HStack {
+                    Text("职业:")
+                        .fontWeight(.medium)
+                    TextField("输入职业", text: $occupation)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                }
+                
+                Button("创建Person对象") {
+                    person = PersonModel(name: name, age: age, occupation: occupation)
+                }
+                .padding()
+                .background(Color.purple)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                
+                if let person = person {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("创建的对象信息：")
+                            .fontWeight(.semibold)
+                        Text("姓名：\(person.name)")
+                        Text("年龄：\(person.age)岁")
+                        Text("职业：\(person.occupation)")
+                        Text("介绍：\(person.introduce())")
+                            .foregroundColor(.blue)
+                        Text("是否成年：\(person.isAdult ? "是" : "否")")
+                            .foregroundColor(person.isAdult ? .green : .red)
+                    }
+                    .padding()
+                    .background(Color.purple.opacity(0.1))
+                    .cornerRadius(8)
+                }
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
+}
+
+class PersonModel {
+    let name: String
+    let age: Int
+    let occupation: String
+    
+    init(name: String, age: Int, occupation: String) {
+        self.name = name
+        self.age = age
+        self.occupation = occupation
+    }
+    
+    func introduce() -> String {
+        return "我是\(name)，今年\(age)岁，职业是\(occupation)"
+    }
+    
+    var isAdult: Bool {
+        return age >= 18
+    }
+}
+
+// MARK: - 银行账户管理器
+struct BankAccountCard: View {
+    @State private var account = BankAccount()
+    @State private var depositAmount: String = ""
+    @State private var withdrawAmount: String = ""
+    @State private var messages: [String] = []
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("银行账户类")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.green)
+            
+            Text("使用类实现银行账户管理，体验属性观察器")
+                .font(.body)
+                .foregroundColor(.secondary)
+            
+            VStack(alignment: .leading, spacing: 12) {
+                Text("当前余额：\(account.formattedBalance)")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.green)
+                
+                HStack {
+                    TextField("存款金额", text: $depositAmount)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .keyboardType(.decimalPad)
+                    
+                    Button("存款") {
+                        if let amount = Double(depositAmount), amount > 0 {
+                            account.deposit(amount)
+                            depositAmount = ""
+                            messages.append("存款 ¥\(String(format: "%.2f", amount)) 成功")
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(6)
+                }
+                
+                HStack {
+                    TextField("取款金额", text: $withdrawAmount)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .keyboardType(.decimalPad)
+                    
+                    Button("取款") {
+                        if let amount = Double(withdrawAmount), amount > 0 {
+                            if account.withdraw(amount) {
+                                messages.append("取款 ¥\(String(format: "%.2f", amount)) 成功")
+                            } else {
+                                messages.append("余额不足，无法取款 ¥\(String(format: "%.2f", amount))")
+                            }
+                            withdrawAmount = ""
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                    .background(Color.red)
+                    .foregroundColor(.white)
+                    .cornerRadius(6)
+                }
+                
+                if !messages.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("操作记录：")
+                            .fontWeight(.semibold)
+                        ForEach(messages.suffix(5), id: \.self) { message in
+                            Text("• \(message)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding()
+                    .background(Color.green.opacity(0.1))
+                    .cornerRadius(8)
+                }
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
+}
+
+class BankAccount {
+    var balance: Double = 0 {
+        willSet {
+            print("余额即将变为 ¥\(String(format: "%.2f", newValue))")
+        }
+        didSet {
+            print("余额已更新：¥\(String(format: "%.2f", oldValue)) → ¥\(String(format: "%.2f", balance))")
+        }
+    }
+    
+    var formattedBalance: String {
+        return String(format: "¥%.2f", balance)
+    }
+    
+    func deposit(_ amount: Double) {
+        balance += amount
+    }
+    
+    func withdraw(_ amount: Double) -> Bool {
+        if balance >= amount {
+            balance -= amount
+            return true
+        }
+        return false
+    }
+}
+
+// MARK: - 几何图形计算器
+struct RectangleCard: View {
+    @State private var width: String = "10"
+    @State private var height: String = "5"
+    @State private var rectangle: RectangleModel?
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("几何图形结构体")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.blue)
+            
+            Text("使用结构体实现几何图形计算")
+                .font(.body)
+                .foregroundColor(.secondary)
+            
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("宽度:")
+                        .fontWeight(.medium)
+                    TextField("宽度", text: $width)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .keyboardType(.decimalPad)
+                }
+                
+                HStack {
+                    Text("高度:")
+                        .fontWeight(.medium)
+                    TextField("高度", text: $height)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .keyboardType(.decimalPad)
+                }
+                
+                Button("创建矩形") {
+                    if let w = Double(width), let h = Double(height), w > 0, h > 0 {
+                        rectangle = RectangleModel(width: w, height: h)
+                    }
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                
+                if let rect = rectangle {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("矩形属性：")
+                            .fontWeight(.semibold)
+                        Text("宽度：\(String(format: "%.1f", rect.width))")
+                        Text("高度：\(String(format: "%.1f", rect.height))")
+                        Text("面积：\(String(format: "%.1f", rect.area()))")
+                            .foregroundColor(.green)
+                        Text("周长：\(String(format: "%.1f", rect.perimeter()))")
+                            .foregroundColor(.orange)
+                        Text("类型：\(rect.isSquare ? "正方形" : "矩形")")
+                            .foregroundColor(.blue)
+                    }
+                    .padding()
+                    .background(Color.blue.opacity(0.1))
+                    .cornerRadius(8)
+                }
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
+}
+
+struct RectangleModel {
+    let width: Double
+    let height: Double
+    
+    func area() -> Double {
+        return width * height
+    }
+    
+    func perimeter() -> Double {
+        return 2 * (width + height)
+    }
+    
+    var isSquare: Bool {
+        return abs(width - height) < 0.001
+    }
+}
+
+// MARK: - 计数器类实现
+struct CounterCard: View {
+    @State private var counter = CounterModel()
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("计数器结构体")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.orange)
+            
+            Text("体验结构体的mutating方法")
+                .font(.body)
+                .foregroundColor(.secondary)
+            
+            VStack(spacing: 16) {
+                Text("当前计数：\(counter.count)")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.orange)
+                
+                HStack(spacing: 20) {
+                    Button("增加 1") {
+                        counter.increment()
+                    }
+                    .padding()
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                    
+                    Button("增加 5") {
+                        counter.increment(by: 5)
+                    }
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                    
+                    Button("重置") {
+                        counter.reset()
+                    }
+                    .padding()
+                    .background(Color.red)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("计数器信息：")
+                        .fontWeight(.semibold)
+                    Text("类型说明：\(CounterModel.description())")
+                        .foregroundColor(.secondary)
+                    Text("是否为正数：\(counter.isPositive ? "是" : "否")")
+                        .foregroundColor(counter.isPositive ? .green : .red)
+                }
+                .padding()
+                .background(Color.orange.opacity(0.1))
+                .cornerRadius(8)
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
+}
+
+struct CounterModel {
+    var count = 0
+    
+    mutating func increment() {
+        count += 1
+    }
+    
+    mutating func increment(by amount: Int) {
+        count += amount
+    }
+    
+    mutating func reset() {
+        count = 0
+    }
+    
+    var isPositive: Bool {
+        return count > 0
+    }
+    
+    static func description() -> String {
+        return "这是一个计数器结构体"
+    }
+}
+
+// MARK: - 学生信息管理
+struct StudentCard: View {
+    @State private var student: StudentModel?
+    @State private var name = "张三"
+    @State private var studentId = "2024001"
+    @State private var subject = "数学"
+    @State private var scoreText = "85"
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("学生信息管理类")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.indigo)
+            
+            Text("综合运用类的属性和方法")
+                .font(.body)
+                .foregroundColor(.secondary)
+            
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("姓名:")
+                        .fontWeight(.medium)
+                    TextField("学生姓名", text: $name)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                }
+                
+                HStack {
+                    Text("学号:")
+                        .fontWeight(.medium)
+                    TextField("学生学号", text: $studentId)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                }
+                
+                Button("创建学生") {
+                    student = StudentModel(name: name, studentId: studentId)
+                }
+                .padding()
+                .background(Color.indigo)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                
+                if let student = student {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("学生信息：")
+                            .fontWeight(.semibold)
+                        Text("姓名：\(student.name)")
+                        Text("学号：\(student.studentId)")
+                        Text("平均分：\(String(format: "%.1f", student.averageScore))")
+                        
+                        HStack {
+                            TextField("科目", text: $subject)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            TextField("分数", text: $scoreText)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .keyboardType(.numberPad)
+                            
+                            Button("添加") {
+                                if let score = Double(scoreText) {
+                                    student.addScore(subject: subject, score: score)
+                                    scoreText = ""
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .background(Color.green)
+                            .foregroundColor(.white)
+                            .cornerRadius(6)
+                        }
+                        
+                        if !student.scores.isEmpty {
+                            Text("成绩记录：")
+                                .fontWeight(.semibold)
+                                .padding(.top)
+                            ForEach(Array(student.scores.keys.sorted()), id: \.self) { key in
+                                Text("\(key): \(String(format: "%.1f", student.scores[key] ?? 0))")
+                                    .font(.caption)
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(Color.indigo.opacity(0.1))
+                    .cornerRadius(8)
+                }
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
+}
+
+class StudentModel: ObservableObject {
+    let name: String
+    let studentId: String
+    @Published var scores: [String: Double] = [:]
+    
+    init(name: String, studentId: String) {
+        self.name = name
+        self.studentId = studentId
+    }
+    
+    func addScore(subject: String, score: Double) {
+        scores[subject] = score
+    }
+    
+    var averageScore: Double {
+        guard !scores.isEmpty else { return 0.0 }
+        let total = scores.values.reduce(0, +)
+        return total / Double(scores.count)
+    }
+}
+
+// MARK: - 商品属性展示
+struct ProductCard: View {
+    @State private var products: [ProductModel] = []
+    @State private var name = "iPhone 15"
+    @State private var priceText = "5999"
+    @State private var category = "电子产品"
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("商品管理结构体")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.pink)
+            
+            Text("使用结构体管理商品信息和计算")
+                .font(.body)
+                .foregroundColor(.secondary)
+            
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("名称:")
+                        .fontWeight(.medium)
+                    TextField("商品名称", text: $name)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                }
+                
+                HStack {
+                    Text("价格:")
+                        .fontWeight(.medium)
+                    TextField("价格", text: $priceText)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .keyboardType(.decimalPad)
+                    Text("元")
+                }
+                
+                HStack {
+                    Text("类别:")
+                        .fontWeight(.medium)
+                    TextField("商品类别", text: $category)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                }
+                
+                Button("添加商品") {
+                    if let price = Double(priceText), !name.isEmpty {
+                        let product = ProductModel(name: name, price: price, category: category)
+                        products.append(product)
+                        name = ""
+                        priceText = ""
+                        category = ""
+                    }
+                }
+                .padding()
+                .background(Color.pink)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                
+                if !products.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("商品列表：")
+                                .fontWeight(.semibold)
+                            Spacer()
+                            Text("总价值：¥\(String(format: "%.2f", ProductModel.totalValue(products)))")
+                                .fontWeight(.semibold)
+                                .foregroundColor(.green)
+                        }
+                        
+                        ForEach(products.indices, id: \.self) { index in
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack {
+                                    Text(products[index].name)
+                                        .fontWeight(.medium)
+                                    Spacer()
+                                    Text("¥\(String(format: "%.2f", products[index].price))")
+                                        .foregroundColor(.green)
+                                }
+                                Text("类别：\(products[index].category)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Text("折扣价：\(products[index].formattedDiscountPrice(0.8))")
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                            }
+                            .padding(.vertical, 4)
+                            Divider()
+                        }
+                    }
+                    .padding()
+                    .background(Color.pink.opacity(0.1))
+                    .cornerRadius(8)
+                }
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
+}
+
+struct ProductModel {
+    let name: String
+    let price: Double
+    let category: String
+    
+    func formattedDiscountPrice(_ discount: Double) -> String {
+        let discountedPrice = price * discount
+        return "¥\(String(format: "%.2f", discountedPrice))"
+    }
+    
+    static func totalValue(_ products: [ProductModel]) -> Double {
+        return products.reduce(0) { $0 + $1.price }
+    }
+}
+
 // MARK: - 预览
 struct InteractiveComponents_Previews: PreviewProvider {
     static var previews: some View {

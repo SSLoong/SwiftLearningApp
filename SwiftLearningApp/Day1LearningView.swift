@@ -300,72 +300,7 @@ struct PracticeSection: View {
     }
 }
 
-// MARK: - 通用组件
-
-struct ConceptCard: View {
-    let title: String
-    let content: String
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.blue)
-            
-            Text(content)
-                .font(.body)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.blue.opacity(0.05))
-        .cornerRadius(12)
-    }
-}
-
-struct CodeExampleCard: View {
-    let title: String
-    let code: String
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.green)
-            
-            Text(code)
-                .font(.system(.body, design: .monospaced))
-                .padding()
-                .background(Color.black.opacity(0.05))
-                .cornerRadius(8)
-        }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.green.opacity(0.05))
-        .cornerRadius(12)
-    }
-}
-
-struct TipCard: View {
-    let title: String
-    let content: String
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.orange)
-            
-            Text(content)
-                .font(.body)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.orange.opacity(0.05))
-        .cornerRadius(12)
-    }
-}
+// MARK: - 基础组件现在在 SharedComponents.swift 中定义
 
 // MARK: - 预览
 struct Day1LearningView_Previews: PreviewProvider {

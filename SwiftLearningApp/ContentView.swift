@@ -9,6 +9,7 @@ struct ContentView: View {
     @State private var showingDay2Detail = false
     @State private var showingDay3Detail = false
     @State private var showingDay4Detail = false
+    @State private var showingDay5Detail = false
     
     var body: some View {
         NavigationView {
@@ -90,6 +91,19 @@ struct ContentView: View {
                     }
                 )
                 
+                // Day 5 学习卡片
+                DayLearningCard(
+                    day: 5,
+                    title: "类与结构体基础",
+                    description: "面向对象编程的核心概念：类、结构体和属性",
+                    topics: ["类定义", "结构体", "属性类型", "方法定义"],
+                    isCompleted: false,
+                    action: {
+                        selectedDay = 5
+                        showingDay5Detail = true
+                    }
+                )
+                
                 // 即将推出的课程
                 ComingSoonCard()
                 
@@ -103,6 +117,8 @@ struct ContentView: View {
                         showingDay3Detail = true
                     } else if selectedDay == 4 {
                         showingDay4Detail = true
+                    } else if selectedDay == 5 {
+                        showingDay5Detail = true
                     }
                 }) {
                     HStack {
@@ -136,6 +152,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showingDay4Detail) {
             Day4LearningView()
+        }
+        .sheet(isPresented: $showingDay5Detail) {
+            Day5LearningView()
         }
     }
 }
@@ -225,7 +244,7 @@ struct ComingSoonCard: View {
                 .font(.headline)
                 .fontWeight(.semibold)
             
-            Text("Day 5-21 正在开发中\n敬请期待！")
+            Text("Day 6-21 正在开发中\n敬请期待！")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
