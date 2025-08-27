@@ -2084,6 +2084,1666 @@ struct FizzBuzzGameCard: View {
     }
 }
 
+// MARK: - Day 4 交互式组件
+
+// MARK: - 可选类型解析器
+struct OptionalExplorerCard: View {
+    @State private var inputText = "Swift"
+    @State private var isNil = false
+    @State private var selectedOperation = "检查值"
+    
+    let operations = ["检查值", "强制解包", "可选绑定", "nil合并"]
+    
+    var optionalValue: String? {
+        return isNil ? nil : (inputText.isEmpty ? nil : inputText)
+    }
+    
+    var operationResult: (result: String, isSuccess: Bool) {
+        switch selectedOperation {
+        case "检查值":
+            if optionalValue != nil {
+                return ("值存在: \"\(optionalValue!)\"", true)
+            } else {
+                return ("值为 nil", false)
+            }
+        case "强制解包":
+            if optionalValue != nil {
+                return ("强制解包成功: \"\(optionalValue!)\"", true)
+            } else {
+                return ("⚠️ 强制解包会崩溃！", false)
+            }
+        case "可选绑定":
+            if let value = optionalValue {
+                return ("if let 绑定成功: \"\(value)\"", true)
+            } else {
+                return ("if let 绑定失败，执行 else 分支", false)
+            }
+        case "nil合并":
+            let result = optionalValue ?? "默认值"
+            return ("nil合并结果: \"\(result)\"", true)
+        default:
+            return ("", true)
+        }
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("❓ 可选类型解析器")
+                .font(.headline)
+                .foregroundColor(.orange)
+            
+            VStack(spacing: 16) {
+                // 输入控制
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("输入值：")
+                        TextField("输入文本", text: $inputText)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .disabled(isNil)
+                    }
+                    
+                    Toggle("设为 nil", isOn: $isNil)
+                }
+                
+                // 可选值状态展示
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("可选值状态：")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    HStack {
+                        Text("String?")
+                            .font(.system(.body, design: .monospaced))
+                            .foregroundColor(.secondary)
+                        
+                        Spacer()
+                        
+                        if let value = optionalValue {
+                            Text("Optional(\"\(value)\")")
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundColor(.green)
+                        } else {
+                            Text("nil")
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundColor(.red)
+                        }
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(8)
+                }
+                
+                // 操作选择
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("选择操作：")
+                        .font(.subheadline)
+                    
+                    Picker("操作", selection: $selectedOperation) {
+                        ForEach(operations, id: \.self) { operation in
+                            Text(operation).tag(operation)
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                }
+                
+                // 操作结果
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("操作结果：")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    Text(operationResult.result)
+                        .font(.system(.body, design: .monospaced))
+                        .foregroundColor(operationResult.isSuccess ? .green : .red)
+                        .padding()
+                        .background(operationResult.isSuccess ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
+                        .cornerRadius(8)
+                }
+                
+                // 对应代码展示
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("对应的Swift代码：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    Text(getSwiftCode())
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundColor(.secondary)
+                        .padding()
+                        .background(Color.orange.opacity(0.05))
+                        .cornerRadius(6)
+                }
+            }
+        }
+        .padding()
+        .background(Color.orange.opacity(0.05))
+        .cornerRadius(12)
+    }
+    
+    private func getSwiftCode() -> String {
+        let valueDeclaration = isNil ? "let value: String? = nil" : "let value: String? = \"\(inputText)\""
+        
+        switch selectedOperation {
+        case "检查值":
+            return """
+            \(valueDeclaration)
+            if value != nil {
+                print("值存在")
+            } else {
+                print("值为 nil")
+            }
+            """
+        case "强制解包":
+            return """
+            \(valueDeclaration)
+            let result = value!  // 危险操作
+            """
+        case "可选绑定":
+            return """
+            \(valueDeclaration)
+            if let unwrapped = value {
+                print("绑定成功: \\(unwrapped)")
+            } else {
+                print("绑定失败")
+            }
+            """
+        case "nil合并":
+            return """
+            \(valueDeclaration)
+            let result = value ?? "默认值"
+            """
+        default:
+            return ""
+        }
+    }
+}
+
+// MARK: - 可选绑定练习器
+struct OptionalBindingPracticeCard: View {
+    @State private var name: String = "小明"
+    @State private var age: String = "25"
+    @State private var email: String = ""
+    @State private var phone: String = ""
+    
+    var bindingResults: [(field: String, success: Bool, value: String)] {
+        var results: [(String, Bool, String)] = []
+        
+        // 姓名绑定
+        if !name.isEmpty {
+            results.append(("姓名", true, name))
+        } else {
+            results.append(("姓名", false, "绑定失败"))
+        }
+        
+        // 年龄绑定
+        if let ageInt = Int(age) {
+            results.append(("年龄", true, "\(ageInt)岁"))
+        } else {
+            results.append(("年龄", false, "无效年龄"))
+        }
+        
+        // 邮箱绑定
+        if !email.isEmpty && email.contains("@") {
+            results.append(("邮箱", true, email))
+        } else {
+            results.append(("邮箱", false, email.isEmpty ? "未填写" : "格式错误"))
+        }
+        
+        // 手机绑定
+        if !phone.isEmpty && phone.count >= 11 {
+            results.append(("手机", true, phone))
+        } else {
+            results.append(("手机", false, phone.isEmpty ? "未填写" : "号码太短"))
+        }
+        
+        return results
+    }
+    
+    var canProceed: Bool {
+        return bindingResults.filter { $0.success }.count >= 2
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("🔗 可选绑定练习器")
+                .font(.headline)
+                .foregroundColor(.blue)
+            
+            VStack(spacing: 16) {
+                // 输入表单
+                VStack(spacing: 12) {
+                    HStack {
+                        Text("姓名：")
+                            .frame(width: 50, alignment: .leading)
+                        TextField("请输入姓名", text: $name)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    HStack {
+                        Text("年龄：")
+                            .frame(width: 50, alignment: .leading)
+                        TextField("请输入年龄", text: $age)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .keyboardType(.numberPad)
+                    }
+                    
+                    HStack {
+                        Text("邮箱：")
+                            .frame(width: 50, alignment: .leading)
+                        TextField("请输入邮箱（可选）", text: $email)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .keyboardType(.emailAddress)
+                    }
+                    
+                    HStack {
+                        Text("手机：")
+                            .frame(width: 50, alignment: .leading)
+                        TextField("请输入手机（可选）", text: $phone)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .keyboardType(.phonePad)
+                    }
+                }
+                
+                // 绑定结果展示
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("可选绑定结果：")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    ForEach(bindingResults, id: \.field) { result in
+                        HStack {
+                            Image(systemName: result.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                .foregroundColor(result.success ? .green : .red)
+                            
+                            Text(result.field)
+                                .font(.body)
+                                .frame(width: 40, alignment: .leading)
+                            
+                            Text(result.value)
+                                .font(.body)
+                                .foregroundColor(result.success ? .primary : .secondary)
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                    }
+                }
+                .padding()
+                .background(Color.blue.opacity(0.05))
+                .cornerRadius(8)
+                
+                // 处理结果
+                VStack(spacing: 8) {
+                    HStack {
+                        Text("处理状态：")
+                        Spacer()
+                        Text(canProceed ? "✅ 可以继续" : "❌ 信息不足")
+                            .fontWeight(.semibold)
+                            .foregroundColor(canProceed ? .green : .red)
+                    }
+                    
+                    if canProceed {
+                        let successCount = bindingResults.filter { $0.success }.count
+                        Text("成功绑定 \(successCount) 个字段，满足处理条件")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                    } else {
+                        Text("至少需要2个有效字段才能继续处理")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                }
+                
+                // guard let 示例代码
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("对应的guard let代码：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    Text("""
+                    func processUser(name: String?, age: String?) {
+                        guard !name.isEmpty,
+                              let ageInt = Int(age) else {
+                            print("用户信息不完整")
+                            return
+                        }
+                        print("处理用户: \\(name), \\(ageInt)岁")
+                    }
+                    """)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundColor(.secondary)
+                        .padding()
+                        .background(Color.blue.opacity(0.05))
+                        .cornerRadius(6)
+                }
+            }
+        }
+        .padding()
+        .background(Color.blue.opacity(0.05))
+        .cornerRadius(12)
+    }
+}
+
+// MARK: - 安全解包对比器
+struct SafeUnwrappingComparisonCard: View {
+    @State private var inputValue = "Swift"
+    @State private var makeNil = false
+    @State private var selectedMethod = "可选绑定"
+    
+    let unwrappingMethods = ["可选绑定", "nil合并", "强制解包", "可选链"]
+    
+    var optionalString: String? {
+        return makeNil ? nil : (inputValue.isEmpty ? nil : inputValue)
+    }
+    
+    var methodResult: (code: String, result: String, safety: String, color: Color) {
+        switch selectedMethod {
+        case "可选绑定":
+            let code = """
+            if let value = optionalString {
+                return "长度: \\(value.count)"
+            } else {
+                return "值为空"
+            }
+            """
+            let result = optionalString != nil ? "长度: \(optionalString!.count)" : "值为空"
+            return (code, result, "✅ 安全", .green)
+            
+        case "nil合并":
+            let code = """
+            let value = optionalString ?? "默认值"
+            return "长度: \\(value.count)"
+            """
+            let value = optionalString ?? "默认值"
+            let result = "长度: \(value.count)"
+            return (code, result, "✅ 安全", .green)
+            
+        case "强制解包":
+            let code = """
+            let value = optionalString!
+            return "长度: \\(value.count)"
+            """
+            let result = optionalString != nil ? "长度: \(optionalString!.count)" : "💥 运行时崩溃"
+            let safety = optionalString != nil ? "⚠️ 危险但成功" : "❌ 会崩溃"
+            let color: Color = optionalString != nil ? .orange : .red
+            return (code, result, safety, color)
+            
+        case "可选链":
+            let code = """
+            let length = optionalString?.count
+            return length != nil ? "长度: \\(length!)" : "无法获取长度"
+            """
+            let result = optionalString?.count != nil ? "长度: \(optionalString!.count)" : "无法获取长度"
+            return (code, result, "✅ 安全", .green)
+            
+        default:
+            return ("", "", "", .gray)
+        }
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("🛡️ 安全解包对比器")
+                .font(.headline)
+                .foregroundColor(.green)
+            
+            VStack(spacing: 16) {
+                // 输入控制
+                VStack(spacing: 8) {
+                    HStack {
+                        Text("字符串值：")
+                        TextField("输入字符串", text: $inputValue)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .disabled(makeNil)
+                    }
+                    
+                    Toggle("模拟nil值", isOn: $makeNil)
+                }
+                
+                // 当前可选值状态
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("当前可选值：")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    Text(optionalString != nil ? "Optional(\"\(optionalString!)\")" : "nil")
+                        .font(.system(.body, design: .monospaced))
+                        .foregroundColor(optionalString != nil ? .green : .red)
+                        .padding()
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(6)
+                }
+                
+                // 解包方法选择
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("选择解包方法：")
+                        .font(.subheadline)
+                    
+                    Picker("解包方法", selection: $selectedMethod) {
+                        ForEach(unwrappingMethods, id: \.self) { method in
+                            Text(method).tag(method)
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                }
+                
+                // 方法对比结果
+                VStack(spacing: 12) {
+                    // 安全性评级
+                    HStack {
+                        Text("安全性：")
+                            .font(.subheadline)
+                        Spacer()
+                        Text(methodResult.safety)
+                            .fontWeight(.semibold)
+                            .foregroundColor(methodResult.color)
+                    }
+                    
+                    // 执行结果
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("执行结果：")
+                            .font(.subheadline)
+                        
+                        Text(methodResult.result)
+                            .font(.system(.body, design: .monospaced))
+                            .foregroundColor(methodResult.color)
+                            .padding()
+                            .background(methodResult.color.opacity(0.1))
+                            .cornerRadius(6)
+                    }
+                    
+                    // 代码示例
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("代码示例：")
+                            .font(.subheadline)
+                        
+                        Text(methodResult.code)
+                            .font(.system(.caption, design: .monospaced))
+                            .foregroundColor(.secondary)
+                            .padding()
+                            .background(Color.green.opacity(0.05))
+                            .cornerRadius(6)
+                    }
+                }
+                
+                // 最佳实践建议
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("💡 最佳实践：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    switch selectedMethod {
+                    case "可选绑定":
+                        Text("推荐使用！安全且灵活，可以处理nil情况")
+                    case "nil合并":
+                        Text("适合有合理默认值的场景")
+                    case "强制解包":
+                        Text("尽量避免！只在确定不为nil时使用")
+                    case "可选链":
+                        Text("适合链式调用，返回可选值")
+                    default:
+                        Text("")
+                    }
+                }
+                .font(.caption)
+                .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+        .background(Color.green.opacity(0.05))
+        .cornerRadius(12)
+    }
+}
+
+// MARK: - 错误处理模拟器
+struct ErrorHandlingSimulatorCard: View {
+    @State private var selectedOperation = "密码验证"
+    @State private var inputValue = "abc123"
+    @State private var simulateError = false
+    
+    let operations = ["密码验证", "数字转换", "文件读取", "网络请求"]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("🚨 错误处理模拟器")
+                .font(.headline)
+                .foregroundColor(.red)
+            
+            VStack(spacing: 16) {
+                // 操作选择
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("选择操作类型：")
+                        .font(.subheadline)
+                    
+                    Picker("操作", selection: $selectedOperation) {
+                        ForEach(operations, id: \.self) { operation in
+                            Text(operation).tag(operation)
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                }
+                
+                // 输入参数
+                VStack(spacing: 8) {
+                    HStack {
+                        Text("输入值：")
+                        TextField(getPlaceholder(), text: $inputValue)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    Toggle("模拟错误情况", isOn: $simulateError)
+                }
+                
+                // 执行结果
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("执行结果：")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    let result = executeOperation()
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Image(systemName: result.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                .foregroundColor(result.success ? .green : .red)
+                            
+                            Text(result.success ? "执行成功" : "捕获错误")
+                                .fontWeight(.semibold)
+                                .foregroundColor(result.success ? .green : .red)
+                        }
+                        
+                        Text(result.message)
+                            .font(.body)
+                            .foregroundColor(.primary)
+                    }
+                    .padding()
+                    .background(result.success ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
+                    .cornerRadius(8)
+                }
+                
+                // do-catch代码示例
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("对应的do-catch代码：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    Text(getErrorHandlingCode())
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundColor(.secondary)
+                        .padding()
+                        .background(Color.red.opacity(0.05))
+                        .cornerRadius(6)
+                }
+                
+                // 错误类型说明
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("可能的错误类型：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    ForEach(getPossibleErrors(), id: \.self) { error in
+                        Text("• \(error)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color.red.opacity(0.05))
+        .cornerRadius(12)
+    }
+    
+    private func getPlaceholder() -> String {
+        switch selectedOperation {
+        case "密码验证": return "输入密码"
+        case "数字转换": return "输入文本"
+        case "文件读取": return "文件名"
+        case "网络请求": return "URL地址"
+        default: return "输入值"
+        }
+    }
+    
+    private func executeOperation() -> (success: Bool, message: String) {
+        if simulateError {
+            switch selectedOperation {
+            case "密码验证":
+                return (false, "ValidationError.tooShort: 密码长度不足")
+            case "数字转换":
+                return (false, "ConversionError.invalidFormat: 无法转换为数字")
+            case "文件读取":
+                return (false, "FileError.notFound: 文件不存在")
+            case "网络请求":
+                return (false, "NetworkError.connectionFailed: 网络连接失败")
+            default:
+                return (false, "未知错误")
+            }
+        } else {
+            switch selectedOperation {
+            case "密码验证":
+                return (true, "密码验证通过，符合安全要求")
+            case "数字转换":
+                if let _ = Double(inputValue) {
+                    return (true, "成功转换为数字: \(inputValue)")
+                } else {
+                    return (false, "ConversionError.invalidFormat: 无法转换为数字")
+                }
+            case "文件读取":
+                return (true, "文件读取成功: \(inputValue)")
+            case "网络请求":
+                return (true, "网络请求成功，返回数据")
+            default:
+                return (true, "操作成功")
+            }
+        }
+    }
+    
+    private func getErrorHandlingCode() -> String {
+        switch selectedOperation {
+        case "密码验证":
+            return """
+            do {
+                try validatePassword("\(inputValue)")
+                print("密码验证通过")
+            } catch ValidationError.tooShort {
+                print("密码太短")
+            } catch ValidationError.tooWeak {
+                print("密码强度不够")
+            } catch {
+                print("其他错误: \\(error)")
+            }
+            """
+        case "数字转换":
+            return """
+            do {
+                let number = try convertToNumber("\(inputValue)")
+                print("转换成功: \\(number)")
+            } catch ConversionError.invalidFormat {
+                print("格式无效")
+            } catch {
+                print("转换失败: \\(error)")
+            }
+            """
+        case "文件读取":
+            return """
+            do {
+                let content = try readFile("\(inputValue)")
+                print("文件内容: \\(content)")
+            } catch FileError.notFound {
+                print("文件不存在")
+            } catch FileError.permissionDenied {
+                print("权限不足")
+            } catch {
+                print("读取失败: \\(error)")
+            }
+            """
+        case "网络请求":
+            return """
+            do {
+                let data = try fetchData("\(inputValue)")
+                print("请求成功: \\(data)")
+            } catch NetworkError.connectionFailed {
+                print("网络连接失败")
+            } catch NetworkError.timeout {
+                print("请求超时")
+            } catch {
+                print("网络错误: \\(error)")
+            }
+            """
+        default:
+            return ""
+        }
+    }
+    
+    private func getPossibleErrors() -> [String] {
+        switch selectedOperation {
+        case "密码验证":
+            return ["tooShort - 密码太短", "tooWeak - 密码强度不够", "invalidCharacters - 包含无效字符"]
+        case "数字转换":
+            return ["invalidFormat - 格式无效", "overflow - 数值溢出", "underflow - 数值下溢"]
+        case "文件读取":
+            return ["notFound - 文件不存在", "permissionDenied - 权限不足", "corrupted - 文件损坏"]
+        case "网络请求":
+            return ["connectionFailed - 连接失败", "timeout - 请求超时", "serverError - 服务器错误"]
+        default:
+            return []
+        }
+    }
+}
+
+// MARK: - Result类型练习器
+struct ResultTypePracticeCard: View {
+    @State private var selectedOperation = "除法运算"
+    @State private var firstNumber = "10"
+    @State private var secondNumber = "2"
+    @State private var forceError = false
+    
+    let operations = ["除法运算", "数据验证", "API调用", "文件处理"]
+    
+    var calculationResult: Result<Double, CalculationError> {
+        guard let first = Double(firstNumber),
+              let second = Double(secondNumber) else {
+            return .failure(.invalidInput)
+        }
+        
+        if forceError || second == 0 {
+            return .failure(.divisionByZero)
+        }
+        
+        return .success(first / second)
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("📦 Result类型练习器")
+                .font(.headline)
+                .foregroundColor(.indigo)
+            
+            VStack(spacing: 16) {
+                // 操作选择
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("操作类型：")
+                        .font(.subheadline)
+                    
+                    Picker("操作", selection: $selectedOperation) {
+                        ForEach(operations, id: \.self) { operation in
+                            Text(operation).tag(operation)
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                }
+                
+                // 输入参数
+                if selectedOperation == "除法运算" {
+                    VStack(spacing: 8) {
+                        HStack {
+                            Text("被除数：")
+                            TextField("输入数字", text: $firstNumber)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .keyboardType(.decimalPad)
+                        }
+                        
+                        HStack {
+                            Text("除数：")
+                            TextField("输入数字", text: $secondNumber)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .keyboardType(.decimalPad)
+                        }
+                        
+                        Toggle("强制触发错误", isOn: $forceError)
+                    }
+                }
+                
+                // Result处理结果
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Result处理：")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        // switch方式处理
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("使用switch处理：")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                            
+                            let switchResult = handleWithSwitch()
+                            Text(switchResult.message)
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundColor(switchResult.isSuccess ? .green : .red)
+                                .padding()
+                                .background(switchResult.isSuccess ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
+                                .cornerRadius(6)
+                        }
+                        
+                        // map方式处理
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("使用map变换：")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                            
+                            let mapResult = calculationResult.map { "结果的两倍: \($0 * 2)" }
+                            switch mapResult {
+                            case .success(let message):
+                                Text(message)
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundColor(.blue)
+                            case .failure(let error):
+                                Text("变换失败: \(error.localizedDescription)")
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundColor(.red)
+                            }
+                        }
+                        .padding()
+                        .background(Color.blue.opacity(0.1))
+                        .cornerRadius(6)
+                    }
+                }
+                
+                // Result代码示例
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Result处理代码：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    Text(getResultCode())
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundColor(.secondary)
+                        .padding()
+                        .background(Color.indigo.opacity(0.05))
+                        .cornerRadius(6)
+                }
+                
+                // Result优势说明
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("💡 Result类型优势：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("• 可以存储和传递错误信息")
+                        Text("• 支持函数式编程风格")
+                        Text("• 适合异步操作")
+                        Text("• 类型安全的错误处理")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding()
+        .background(Color.indigo.opacity(0.05))
+        .cornerRadius(12)
+    }
+    
+    private func handleWithSwitch() -> (message: String, isSuccess: Bool) {
+        switch calculationResult {
+        case .success(let value):
+            return ("✅ 计算成功: \(String(format: "%.2f", value))", true)
+        case .failure(let error):
+            return ("❌ 计算失败: \(error.localizedDescription)", false)
+        }
+    }
+    
+    private func getResultCode() -> String {
+        return """
+        enum CalculationError: Error {
+            case divisionByZero
+            case invalidInput
+        }
+
+        func divide(_ a: Double, by b: Double) -> Result<Double, CalculationError> {
+            guard b != 0 else {
+                return .failure(.divisionByZero)
+            }
+            return .success(a / b)
+        }
+
+        // 使用Result
+        let result = divide(\(firstNumber), by: \(secondNumber))
+        switch result {
+        case .success(let value):
+            print("结果: \\(value)")
+        case .failure(let error):
+            print("错误: \\(error)")
+        }
+        """
+    }
+}
+
+enum CalculationError: Error {
+    case divisionByZero
+    case invalidInput
+    
+    var localizedDescription: String {
+        switch self {
+        case .divisionByZero:
+            return "除数不能为零"
+        case .invalidInput:
+            return "输入格式无效"
+        }
+    }
+}
+
+// MARK: - Day 4 综合练习组件
+
+// MARK: - 用户注册表单验证器
+struct UserRegistrationFormCard: View {
+    @State private var username = ""
+    @State private var email = ""
+    @State private var password = ""
+    @State private var confirmPassword = ""
+    @State private var age = ""
+    
+    var validationResults: [FieldValidation] {
+        var results: [FieldValidation] = []
+        
+        // 用户名验证
+        results.append(validateUsername(username))
+        
+        // 邮箱验证
+        results.append(validateEmail(email))
+        
+        // 密码验证
+        results.append(validatePassword(password))
+        
+        // 确认密码验证
+        results.append(validateConfirmPassword(confirmPassword, original: password))
+        
+        // 年龄验证
+        results.append(validateAge(age))
+        
+        return results
+    }
+    
+    var canRegister: Bool {
+        return validationResults.allSatisfy { $0.isValid }
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("📝 用户注册表单验证器")
+                .font(.headline)
+                .foregroundColor(.purple)
+            
+            VStack(spacing: 16) {
+                // 注册表单
+                VStack(spacing: 12) {
+                    HStack {
+                        Text("用户名")
+                            .frame(width: 70, alignment: .leading)
+                        TextField("输入用户名", text: $username)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    HStack {
+                        Text("邮箱")
+                            .frame(width: 70, alignment: .leading)
+                        TextField("输入邮箱地址", text: $email)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .keyboardType(.emailAddress)
+                    }
+                    
+                    HStack {
+                        Text("密码")
+                            .frame(width: 70, alignment: .leading)
+                        SecureField("输入密码", text: $password)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    HStack {
+                        Text("确认密码")
+                            .frame(width: 70, alignment: .leading)
+                        SecureField("再次输入密码", text: $confirmPassword)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    HStack {
+                        Text("年龄")
+                            .frame(width: 70, alignment: .leading)
+                        TextField("输入年龄", text: $age)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .keyboardType(.numberPad)
+                    }
+                }
+                
+                // 验证结果
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("字段验证结果：")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    ForEach(validationResults, id: \.fieldName) { validation in
+                        HStack {
+                            Image(systemName: validation.isValid ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                .foregroundColor(validation.isValid ? .green : .red)
+                            
+                            VStack(alignment: .leading) {
+                                Text(validation.fieldName)
+                                    .font(.body)
+                                    .fontWeight(.medium)
+                                
+                                Text(validation.message)
+                                    .font(.caption)
+                                    .foregroundColor(validation.isValid ? .green : .red)
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                    }
+                }
+                .padding()
+                .background(Color.purple.opacity(0.1))
+                .cornerRadius(8)
+                
+                // 注册按钮
+                Button(action: {
+                    // 模拟注册操作
+                }) {
+                    HStack {
+                        Image(systemName: "person.badge.plus")
+                        Text("注册账户")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(canRegister ? Color.purple : Color.gray)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                }
+                .disabled(!canRegister)
+                
+                if canRegister {
+                    Text("✅ 所有字段验证通过，可以注册")
+                        .font(.caption)
+                        .foregroundColor(.green)
+                } else {
+                    let invalidCount = validationResults.filter { !$0.isValid }.count
+                    Text("❌ 还有\(invalidCount)个字段需要修正")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                }
+                
+                // 验证代码示例
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("guard let验证示例：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    Text("""
+                    func validateRegistration() throws -> User {
+                        guard !username.isEmpty else {
+                            throw ValidationError.emptyUsername
+                        }
+                        
+                        guard email.contains("@") else {
+                            throw ValidationError.invalidEmail
+                        }
+                        
+                        guard password.count >= 6 else {
+                            throw ValidationError.weakPassword
+                        }
+                        
+                        return User(username: username, email: email)
+                    }
+                    """)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundColor(.secondary)
+                        .padding()
+                        .background(Color.purple.opacity(0.05))
+                        .cornerRadius(6)
+                }
+            }
+        }
+        .padding()
+        .background(Color.purple.opacity(0.05))
+        .cornerRadius(12)
+    }
+    
+    private func validateUsername(_ username: String) -> FieldValidation {
+        if username.isEmpty {
+            return FieldValidation(fieldName: "用户名", isValid: false, message: "用户名不能为空")
+        }
+        if username.count < 3 {
+            return FieldValidation(fieldName: "用户名", isValid: false, message: "用户名至少3个字符")
+        }
+        return FieldValidation(fieldName: "用户名", isValid: true, message: "用户名格式正确")
+    }
+    
+    private func validateEmail(_ email: String) -> FieldValidation {
+        if email.isEmpty {
+            return FieldValidation(fieldName: "邮箱", isValid: false, message: "邮箱不能为空")
+        }
+        if !email.contains("@") || !email.contains(".") {
+            return FieldValidation(fieldName: "邮箱", isValid: false, message: "邮箱格式不正确")
+        }
+        return FieldValidation(fieldName: "邮箱", isValid: true, message: "邮箱格式正确")
+    }
+    
+    private func validatePassword(_ password: String) -> FieldValidation {
+        if password.isEmpty {
+            return FieldValidation(fieldName: "密码", isValid: false, message: "密码不能为空")
+        }
+        if password.count < 6 {
+            return FieldValidation(fieldName: "密码", isValid: false, message: "密码至少6位")
+        }
+        return FieldValidation(fieldName: "密码", isValid: true, message: "密码强度合格")
+    }
+    
+    private func validateConfirmPassword(_ confirmPassword: String, original: String) -> FieldValidation {
+        if confirmPassword.isEmpty {
+            return FieldValidation(fieldName: "确认密码", isValid: false, message: "请再次输入密码")
+        }
+        if confirmPassword != original {
+            return FieldValidation(fieldName: "确认密码", isValid: false, message: "两次密码不一致")
+        }
+        return FieldValidation(fieldName: "确认密码", isValid: true, message: "密码确认正确")
+    }
+    
+    private func validateAge(_ age: String) -> FieldValidation {
+        if age.isEmpty {
+            return FieldValidation(fieldName: "年龄", isValid: false, message: "年龄不能为空")
+        }
+        guard let ageValue = Int(age), ageValue >= 18 && ageValue <= 100 else {
+            return FieldValidation(fieldName: "年龄", isValid: false, message: "年龄必须在18-100之间")
+        }
+        return FieldValidation(fieldName: "年龄", isValid: true, message: "年龄有效")
+    }
+}
+
+struct FieldValidation {
+    let fieldName: String
+    let isValid: Bool
+    let message: String
+}
+
+// MARK: - 数据转换管道
+struct DataTransformationPipelineCard: View {
+    @State private var inputData = "1,2,3,abc,5,6,xyz,8,9,10"
+    @State private var showSteps = true
+    
+    var transformationSteps: [(step: String, input: String, output: String, success: Bool)] {
+        var steps: [(String, String, String, Bool)] = []
+        
+        // 步骤1: 分割字符串
+        let components = inputData.components(separatedBy: ",")
+        steps.append(("1. 字符串分割", inputData, components.joined(separator: " | "), true))
+        
+        // 步骤2: 尝试转换为数字
+        let numbers = components.compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+        let conversionSuccess = numbers.count == components.count
+        steps.append(("2. 数字转换", components.joined(separator: ", "), numbers.map(String.init).joined(separator: ", "), conversionSuccess))
+        
+        // 步骤3: 过滤有效数字
+        let validNumbers = numbers.filter { $0 > 0 }
+        steps.append(("3. 正数过滤", numbers.map(String.init).joined(separator: ", "), validNumbers.map(String.init).joined(separator: ", "), true))
+        
+        // 步骤4: 计算统计信息
+        if !validNumbers.isEmpty {
+            let sum = validNumbers.reduce(0, +)
+            let avg = Double(sum) / Double(validNumbers.count)
+            steps.append(("4. 统计计算", validNumbers.map(String.init).joined(separator: ", "), "总和: \(sum), 平均: \(String(format: "%.1f", avg))", true))
+        } else {
+            steps.append(("4. 统计计算", "无有效数据", "无法计算", false))
+        }
+        
+        return steps
+    }
+    
+    var finalResult: Result<DataSummary, DataError> {
+        let components = inputData.components(separatedBy: ",")
+        
+        guard !components.isEmpty else {
+            return .failure(.emptyInput)
+        }
+        
+        let numbers = components.compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+        
+        guard !numbers.isEmpty else {
+            return .failure(.noValidNumbers)
+        }
+        
+        let validNumbers = numbers.filter { $0 > 0 }
+        
+        guard !validNumbers.isEmpty else {
+            return .failure(.noPositiveNumbers)
+        }
+        
+        let sum = validNumbers.reduce(0, +)
+        let average = Double(sum) / Double(validNumbers.count)
+        let max = validNumbers.max() ?? 0
+        let min = validNumbers.min() ?? 0
+        
+        return .success(DataSummary(
+            count: validNumbers.count,
+            sum: sum,
+            average: average,
+            max: max,
+            min: min,
+            validNumbers: validNumbers
+        ))
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("🔄 数据转换管道")
+                .font(.headline)
+                .foregroundColor(.blue)
+            
+            VStack(spacing: 16) {
+                // 输入数据
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("输入数据（逗号分隔）：")
+                        .font(.subheadline)
+                    
+                    TextField("输入数据", text: $inputData)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                }
+                
+                Toggle("显示处理步骤", isOn: $showSteps)
+                
+                // 处理步骤
+                if showSteps {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("处理步骤：")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                        
+                        ForEach(Array(transformationSteps.enumerated()), id: \.offset) { index, step in
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack {
+                                    Image(systemName: step.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                        .foregroundColor(step.success ? .green : .red)
+                                    
+                                    Text(step.step)
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                }
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("输入: \(step.input)")
+                                        .font(.system(.caption, design: .monospaced))
+                                        .foregroundColor(.secondary)
+                                    
+                                    Text("输出: \(step.output)")
+                                        .font(.system(.caption, design: .monospaced))
+                                        .foregroundColor(step.success ? .primary : .red)
+                                }
+                            }
+                            .padding()
+                            .background(step.success ? Color.green.opacity(0.05) : Color.red.opacity(0.05))
+                            .cornerRadius(6)
+                        }
+                    }
+                }
+                
+                // 最终结果
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("最终结果：")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    switch finalResult {
+                    case .success(let summary):
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("✅ 处理成功")
+                                .fontWeight(.semibold)
+                                .foregroundColor(.green)
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("有效数字: \(summary.validNumbers.map(String.init).joined(separator: ", "))")
+                                Text("总计: \(summary.count) 个数字")
+                                Text("总和: \(summary.sum)")
+                                Text("平均值: \(String(format: "%.2f", summary.average))")
+                                Text("最大值: \(summary.max)")
+                                Text("最小值: \(summary.min)")
+                            }
+                            .font(.caption)
+                        }
+                        .padding()
+                        .background(Color.green.opacity(0.1))
+                        .cornerRadius(8)
+                        
+                    case .failure(let error):
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("❌ 处理失败")
+                                .fontWeight(.semibold)
+                                .foregroundColor(.red)
+                            
+                            Text(error.localizedDescription)
+                                .font(.body)
+                        }
+                        .padding()
+                        .background(Color.red.opacity(0.1))
+                        .cornerRadius(8)
+                    }
+                }
+                
+                // Result管道代码示例
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Result管道处理代码：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    Text("""
+                    func processData(_ input: String) -> Result<DataSummary, DataError> {
+                        // 链式处理，任何步骤失败都会返回错误
+                        return parseInput(input)
+                            .flatMap(convertToNumbers)
+                            .flatMap(filterPositive)
+                            .map(calculateStatistics)
+                    }
+                    """)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundColor(.secondary)
+                        .padding()
+                        .background(Color.blue.opacity(0.05))
+                        .cornerRadius(6)
+                }
+            }
+        }
+        .padding()
+        .background(Color.blue.opacity(0.05))
+        .cornerRadius(12)
+    }
+}
+
+struct DataSummary {
+    let count: Int
+    let sum: Int
+    let average: Double
+    let max: Int
+    let min: Int
+    let validNumbers: [Int]
+}
+
+enum DataError: Error {
+    case emptyInput
+    case noValidNumbers
+    case noPositiveNumbers
+    
+    var localizedDescription: String {
+        switch self {
+        case .emptyInput:
+            return "输入为空"
+        case .noValidNumbers:
+            return "没有有效的数字"
+        case .noPositiveNumbers:
+            return "没有正数"
+        }
+    }
+}
+
+// MARK: - 文件操作模拟器
+struct FileOperationSimulatorCard: View {
+    @State private var fileName = "data.txt"
+    @State private var selectedOperation = "读取文件"
+    @State private var simulateSuccess = true
+    
+    let operations = ["读取文件", "写入文件", "删除文件", "创建目录"]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("📁 文件操作模拟器")
+                .font(.headline)
+                .foregroundColor(.green)
+            
+            VStack(spacing: 16) {
+                // 操作配置
+                VStack(spacing: 8) {
+                    HStack {
+                        Text("文件名：")
+                        TextField("输入文件名", text: $fileName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("操作类型：")
+                            .font(.subheadline)
+                        
+                        Picker("操作", selection: $selectedOperation) {
+                            ForEach(operations, id: \.self) { operation in
+                                Text(operation).tag(operation)
+                            }
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                    }
+                    
+                    Toggle("模拟成功操作", isOn: $simulateSuccess)
+                }
+                
+                // 执行结果
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("执行结果：")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    let result = simulateFileOperation()
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Image(systemName: result.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                .foregroundColor(result.success ? .green : .red)
+                            
+                            Text(result.success ? "操作成功" : "操作失败")
+                                .fontWeight(.semibold)
+                                .foregroundColor(result.success ? .green : .red)
+                        }
+                        
+                        Text(result.message)
+                            .font(.body)
+                    }
+                    .padding()
+                    .background(result.success ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
+                    .cornerRadius(8)
+                }
+                
+                // defer语句示例
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("带defer的文件操作代码：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    Text(getDeferCode())
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundColor(.secondary)
+                        .padding()
+                        .background(Color.green.opacity(0.05))
+                        .cornerRadius(6)
+                }
+                
+                // 错误处理说明
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("💡 文件操作最佳实践：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("• 始终使用do-catch处理文件操作错误")
+                        Text("• 使用defer确保资源正确释放")
+                        Text("• 检查文件权限和存在性")
+                        Text("• 处理磁盘空间不足等系统错误")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding()
+        .background(Color.green.opacity(0.05))
+        .cornerRadius(12)
+    }
+    
+    private func simulateFileOperation() -> (success: Bool, message: String) {
+        if simulateSuccess {
+            switch selectedOperation {
+            case "读取文件":
+                return (true, "成功读取文件 '\(fileName)'，内容: Hello, Swift!")
+            case "写入文件":
+                return (true, "成功写入文件 '\(fileName)'，写入了25字节")
+            case "删除文件":
+                return (true, "成功删除文件 '\(fileName)'")
+            case "创建目录":
+                return (true, "成功创建目录 '\(fileName)'")
+            default:
+                return (true, "操作完成")
+            }
+        } else {
+            switch selectedOperation {
+            case "读取文件":
+                return (false, "FileError.notFound: 文件 '\(fileName)' 不存在")
+            case "写入文件":
+                return (false, "FileError.permissionDenied: 没有写入权限")
+            case "删除文件":
+                return (false, "FileError.notFound: 文件 '\(fileName)' 不存在")
+            case "创建目录":
+                return (false, "FileError.alreadyExists: 目录已存在")
+            default:
+                return (false, "操作失败")
+            }
+        }
+    }
+    
+    private func getDeferCode() -> String {
+        return """
+        func \(selectedOperation.lowercased())File(_ filename: String) throws -> String {
+            print("开始\(selectedOperation): \\(filename)")
+            
+            // defer确保清理工作总是执行
+            defer {
+                print("清理资源和临时文件")
+                print("\(selectedOperation)操作结束")
+            }
+            
+            // 模拟文件操作
+            guard simulateSuccess else {
+                throw FileError.operationFailed
+            }
+            
+            return "操作成功"
+        }
+        """
+    }
+}
+
+// MARK: - API调用模拟器
+struct APICallSimulatorCard: View {
+    @State private var apiEndpoint = "/api/users"
+    @State private var requestType = "GET"
+    @State private var simulateSuccess = true
+    @State private var responseDelay = 1.0
+    @State private var isLoading = false
+    
+    let requestTypes = ["GET", "POST", "PUT", "DELETE"]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("🌐 API调用模拟器")
+                .font(.headline)
+                .foregroundColor(.indigo)
+            
+            VStack(spacing: 16) {
+                // API配置
+                VStack(spacing: 8) {
+                    HStack {
+                        Text("API端点：")
+                        TextField("输入API端点", text: $apiEndpoint)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("请求类型：")
+                            .font(.subheadline)
+                        
+                        Picker("请求类型", selection: $requestType) {
+                            ForEach(requestTypes, id: \.self) { type in
+                                Text(type).tag(type)
+                            }
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                    }
+                    
+                    HStack {
+                        Text("响应延迟：")
+                        Slider(value: $responseDelay, in: 0.5...5.0, step: 0.5)
+                        Text("\(String(format: "%.1f", responseDelay))s")
+                            .frame(width: 40)
+                    }
+                    
+                    Toggle("模拟成功响应", isOn: $simulateSuccess)
+                }
+                
+                // API调用按钮
+                Button(action: {
+                    performAPICall()
+                }) {
+                    HStack {
+                        if isLoading {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                        } else {
+                            Image(systemName: "network")
+                        }
+                        Text(isLoading ? "请求中..." : "发送API请求")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(isLoading ? Color.gray : Color.indigo)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                }
+                .disabled(isLoading)
+                
+                // Result类型的异步处理示例
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Result异步处理代码：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    Text("""
+                    func fetchUserData(completion: @escaping (Result<User, APIError>) -> Void) {
+                        // 模拟网络延迟
+                        DispatchQueue.global().asyncAfter(deadline: .now() + \(String(format: "%.1f", responseDelay))) {
+                            if simulateSuccess {
+                                let user = User(id: 1, name: "用户")
+                                completion(.success(user))
+                            } else {
+                                completion(.failure(.networkError))
+                            }
+                        }
+                    }
+                    
+                    // 使用API
+                    fetchUserData { result in
+                        DispatchQueue.main.async {
+                            switch result {
+                            case .success(let user):
+                                print("获取用户成功: \\(user)")
+                            case .failure(let error):
+                                print("API调用失败: \\(error)")
+                            }
+                        }
+                    }
+                    """)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundColor(.secondary)
+                        .padding()
+                        .background(Color.indigo.opacity(0.05))
+                        .cornerRadius(6)
+                }
+                
+                // 错误处理类型
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("常见API错误类型：")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("• networkError - 网络连接失败")
+                        Text("• timeout - 请求超时")
+                        Text("• unauthorized - 未授权访问")
+                        Text("• serverError - 服务器内部错误")
+                        Text("• invalidResponse - 响应格式错误")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding()
+        .background(Color.indigo.opacity(0.05))
+        .cornerRadius(12)
+    }
+    
+    private func performAPICall() {
+        isLoading = true
+        
+        // 模拟异步API调用
+        DispatchQueue.main.asyncAfter(deadline: .now() + responseDelay) {
+            isLoading = false
+            // 这里可以显示实际的API调用结果
+        }
+    }
+}
+
 // MARK: - 预览
 struct InteractiveComponents_Previews: PreviewProvider {
     static var previews: some View {
@@ -2113,6 +3773,17 @@ struct InteractiveComponents_Previews: PreviewProvider {
                 GradeStatisticsCard()
                 PasswordValidatorCard()
                 FizzBuzzGameCard()
+                
+                // Day4 组件
+                OptionalExplorerCard()
+                OptionalBindingPracticeCard()
+                SafeUnwrappingComparisonCard()
+                ErrorHandlingSimulatorCard()
+                ResultTypePracticeCard()
+                UserRegistrationFormCard()
+                DataTransformationPipelineCard()
+                FileOperationSimulatorCard()
+                APICallSimulatorCard()
             }
             .padding()
         }

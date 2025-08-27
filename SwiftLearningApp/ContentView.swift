@@ -8,10 +8,12 @@ struct ContentView: View {
     @State private var showingLearningDetail = false
     @State private var showingDay2Detail = false
     @State private var showingDay3Detail = false
+    @State private var showingDay4Detail = false
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
+            ScrollView {
+                VStack(spacing: 20) {
                 // 应用标题
                 HStack {
                     Image(systemName: "swift")
@@ -35,8 +37,6 @@ struct ContentView: View {
                         .foregroundColor(.secondary)
                 }
                 .padding(.horizontal)
-                
-                Spacer()
                 
                 // Day 1 学习卡片
                 DayLearningCard(
@@ -77,10 +77,21 @@ struct ContentView: View {
                     }
                 )
                 
+                // Day 4 学习卡片
+                DayLearningCard(
+                    day: 4,
+                    title: "可选类型与错误处理",
+                    description: "Optional、错误处理和安全编程",
+                    topics: ["可选类型", "可选绑定", "错误处理", "Result类型"],
+                    isCompleted: false,
+                    action: {
+                        selectedDay = 4
+                        showingDay4Detail = true
+                    }
+                )
+                
                 // 即将推出的课程
                 ComingSoonCard()
-                
-                Spacer()
                 
                 // 开始学习按钮
                 Button(action: {
@@ -90,6 +101,8 @@ struct ContentView: View {
                         showingDay2Detail = true
                     } else if selectedDay == 3 {
                         showingDay3Detail = true
+                    } else if selectedDay == 4 {
+                        showingDay4Detail = true
                     }
                 }) {
                     HStack {
@@ -108,6 +121,7 @@ struct ContentView: View {
                 }
                 .padding(.horizontal)
                 .padding(.bottom)
+                }
             }
             .navigationBarHidden(true)
         }
@@ -119,6 +133,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showingDay3Detail) {
             Day3LearningView()
+        }
+        .sheet(isPresented: $showingDay4Detail) {
+            Day4LearningView()
         }
     }
 }
@@ -208,7 +225,7 @@ struct ComingSoonCard: View {
                 .font(.headline)
                 .fontWeight(.semibold)
             
-            Text("Day 4-21 正在开发中\n敬请期待！")
+            Text("Day 5-21 正在开发中\n敬请期待！")
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
