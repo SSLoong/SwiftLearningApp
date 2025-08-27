@@ -55,10 +55,18 @@ xcodebuild -project SwiftLearningApp.xcodeproj -scheme SwiftLearningApp build
 - Result 类型函数式错误处理
 - **交互式练习**: 9个练习组件
 
+#### Day 5: 类与结构体基础 ✅
+- 类(Class)基础：定义、实例化、构造器
+- 结构体(Struct)基础：值类型vs引用类型
+- 属性类型：存储属性、计算属性、属性观察器
+- 方法定义：实例方法、类型方法、mutating方法
+- **交互式练习**: 6个练习组件
+
 ### 第二阶段：面向对象编程 (Day 5-10) 🚧
-- Day 5-6: 类与结构体
-- Day 7-8: 继承与多态
-- Day 9-10: 协议与扩展
+- Day 5: 类与结构体基础 ✅
+- Day 6: 继承与多态
+- Day 7-8: 协议与扩展
+- Day 9-10: 高级面向对象特性
 
 ### 第三阶段：高级特性 (Day 11-21) 📋
 - Day 11-15: 泛型与协议进阶
@@ -86,11 +94,13 @@ xcodebuild -project SwiftLearningApp.xcodeproj -scheme SwiftLearningApp build
 SwiftLearningApp/
 ├── SwiftLearningApp.swift         # 应用入口点
 ├── ContentView.swift              # 主界面和导航
-├── Day1LearningView.swift         # Day 1-4 学习视图
+├── SharedComponents.swift         # 共享UI组件库
+├── Day1LearningView.swift         # Day 1-5 学习视图
 ├── Day2LearningView.swift         
 ├── Day3LearningView.swift         
 ├── Day4LearningView.swift         
-├── InteractiveComponents.swift    # 27个交互式练习组件
+├── Day5LearningView.swift         # 新增：类与结构体学习
+├── InteractiveComponents.swift    # 33个交互式练习组件
 └── README.md
 ```
 
@@ -109,16 +119,23 @@ SwiftLearningApp/
 - ✅ **Day 2**: 理解函数和集合操作
 - ✅ **Day 3**: 熟练使用条件语句和循环
 - ✅ **Day 4**: 掌握可选类型和错误处理
+- ✅ **Day 5**: 理解类与结构体的面向对象编程基础
 
 ## 🎯 学习成果
 
-完成前4天学习后，你将掌握：
+### 完成前4天学习后，你将掌握：
 - Swift 核心语法和类型系统
 - 函数式编程基础 (闭包、高阶函数)
 - 程序控制流 (条件判断、循环)
 - 安全编程实践 (可选类型、错误处理)
 
-这些是构建 iOS 应用的扎实基础！
+### 完成Day 5学习后，你将进一步掌握：
+- 面向对象编程核心概念 (类vs结构体)
+- 属性系统 (存储属性、计算属性、属性观察器)
+- 方法定义 (实例方法、类型方法)
+- 引用类型vs值类型的区别和应用场景
+
+这些知识构成了开发现代iOS应用的坚实基础！
 
 ## 🤝 贡献指南
 
